@@ -615,6 +615,10 @@ class Piece:
                                 if screen_cx < WIDTH - EXTRA_WIDTH_RIGHT:
                                     if cell_properties and not cell_properties.get('walkable', True):
                                         continue
+                                    if cell_properties.get('terrain') == "cover" and self.type == "Vehicle":
+                                        continue
+                                    if cell_properties.get('terrain') == "ruins" and self.type in ["Vehicle", "Artillery"]:
+                                        continue
                                     if not any(p.position == new_position for p in pieces):
                                         draw_circles("move", screen, (screen_cx, screen_cy))
 
@@ -774,7 +778,7 @@ class Piece:
                         play_animation(screen,explosion_frames_zoomed,(sx, sy))
                     else:
                         print(f"{self.name} shot {i+1}/{self.shots} MISSED at {target.name}!")
-                        # Add a missed shot animation (dust instead of explosion
+                        # Add a missed shot animation (dust instead of explosion)
                     target.down = False
 
 def compatibility(type_1, type_2):
@@ -986,6 +990,10 @@ def handle_click(mouse_pos, pieces, grid_properties, teams):
                         if rect.top >= EXTRA_HEIGHT_TOP and rect.bottom <= (HEIGHT - EXTRA_HEIGHT_BOTTOM):
                             if rect.collidepoint(mouse_pos):
                                 cell_properties = get_cell_properties(new_position, grid_properties)
+                                if cell_properties.get('terrain') == "cover" and piece.type == "Vehicle":
+                                    continue
+                                if cell_properties.get('terrain') == "ruins" and piece.type in ["Vehicle", "Artillery"]:
+                                    continue
                                 if any(p.position == new_position for p in pieces) or not cell_properties.get('walkable', True):
                                     print(f"Movement not allowed: the cell {new_position} is already occupied or is not walkable.")
                                     return
