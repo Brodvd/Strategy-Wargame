@@ -27,17 +27,17 @@ Below is a list of all unit types with their properties:
 | Unit         | Point Value | HP  | Move Distance | Attack Distance | Fire Power | Number Shots | Hit Probability | Note                                                  |
 | :------------ | :---------: | :-: | :-----------: | :-------------: | :--------: | :----------: | :-------------: | :---------------------------------------------------- |
 | rifle         | 50          | 50  | 2             | 2               | 10         | 1            | 0.9             | Basic unit                                            |
-| assault rifle | 100         | 50  | 3             | 2               | 10         | 2            | 0.85            | More mobile, higher volume of fire                    |
-| LMG           | 150         | 80  | 2             | 3               | 15         | 2            | 0.75            | Support infantry, greater range/HP                    |
-| MMG           | 200         | 90  | 1             | 3               | 18         | 3            | 0.7             | Heavy fire, slow, defensive                           |
-| HMG           | 250         | 100 | 1             | 4               | 20         | 3            | 0.65            | Maximum anti-infantry fire, very slow                 |
-| pyromaniac    | 175         | 60  | 3             | 1               | 30         | 1            | 0.8             | Close-quarters assault, very powerful but vulnerable, `HE` |
-| howitzer      | 225         | 90  | 2             | 10              | 75         | 1            | 0.75            | Heavy artillery, powerful against vehicles, `HE`      |
-| mortar        | 150         | 60  | 2             | 10              | 40         | 1            | 0.8             | Light indirect artillery, `HE`                        |
-| anti tank     | 250         | 75  | 1             | 5               | 100        | 1            | 0.9             | Anti-tank specialist, lethal but vulnerable           |
-| armored       | 350         | 150 | 4             | *HMG* | *HMG* | *HMG* | *HMG* | Infantry support                                      |
-| medium tank   | 400         | 300 | 3             | 4* | 70* | 1* | 0.85* | Main battle tank,   adaptable                         |
-| heavy tank    | 500         | 500 | 2             | 4* | 90* | 1* | 0.85* | Assault tank, very durable                            |
+| assault rifle | 75         | 50  | 3             | 2               | 10         | 2            | 0.85            | More mobile, higher volume of fire                    |
+| LMG           | 100         | 80  | 2             | 3               | 15         | 2            | 0.75            | Support infantry, greater range/HP                    |
+| MMG           | 150        | 90  | 1             | 3               | 18         | 3            | 0.7             | Heavy fire, slow, defensive                           |
+| HMG           | 200         | 100 | 1             | 4               | 20         | 3            | 0.65            | Maximum anti-infantry fire, very slow                 |
+| pyromaniac    | 150         | 60  | 3             | 1               | 30         | 1            | 0.8             | Close-quarters assault, very powerful but vulnerable, `HE` |
+| howitzer      | 200         | 90  | 2             | 10              | 75         | 1            | 0.75            | Heavy artillery, powerful against vehicles, `HE`      |
+| mortar        | 100         | 60  | 2             | 10              | 40         | 1            | 0.8             | Light indirect artillery, `HE`                        |
+| anti tank     | 200         | 75  | 1             | 5               | 100        | 1            | 0.9             | Anti-tank specialist, lethal but vulnerable           |
+| armored       | 300         | 150 | 4             | *HMG* | *HMG* | *HMG* | *HMG* | Infantry support                                      |
+| medium tank   | 350         | 300 | 3             | 4* | 70* | 1* | 0.85* | Main battle tank,   adaptable                         |
+| heavy tank    | 450         | 500 | 2             | 4* | 90* | 1* | 0.85* | Assault tank, very durable                            |
 
 `*` Values used for vehicle vs. vehicle combat; otherwise, if the opponent is an infantry unit, these values are replaced by those of the *HMG*.
 
@@ -78,6 +78,7 @@ Below is a list of all unit types with their properties:
 
 - `*` Passable by all units except vehicles
 - `**` Passable by all units that are not vehicles or artillery
+
 **NOTE:** "Ruined" refers to a ruined building, therefore not passable by vehicles and artillery but only soldiers, while "cover" refers to small trenches built with sandbags or stones.
 
 ---
