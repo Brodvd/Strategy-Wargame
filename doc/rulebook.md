@@ -72,14 +72,14 @@ Below is a list of all unit types with their properties:
 | building | 0                 | 0             | 0           | true                 | false    |
 | road     | 0                 | 1             | 0           | false                | true     |
 | bridge   | 10                | 1             | 0           | false                | true     |
-| rough    | 0                 | -1            | 0           | false                | true     |
-| ruined   | 20                | -1            | 0           | true                 | true** |
+| mud      | 0                 | -1            | 0           | false                | true     |
+| ruins    | 20                | -1            | 0           | true                 | true** |
 | cover    | 30                | -1            | 2           | false                | true* |
 
 - `*` Passable by all units except vehicles
 - `**` Passable by all units that are not vehicles or artillery
 
-**NOTE:** "Ruined" refers to a ruined building, therefore not passable by vehicles and artillery but only soldiers, while "cover" refers to small trenches built with sandbags or stones.
+**NOTE:** "Ruins" refers to a ruined building, therefore not passable by vehicles and artillery but only soldiers, while "cover" refers to small trenches built with sandbags or stones.
 
 ---
 
