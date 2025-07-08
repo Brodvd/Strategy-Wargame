@@ -285,7 +285,7 @@ def draw_zoom_indicator(screen, zoom):
 def draw_counters(screen):
     global max_points_red, max_points_blue
 
-    font = pygame.font.Font(None, 36)  # Font for the text
+    font = pygame.font.SysFont("DejaVu Sans Mono", 24, bold=True)  # Font for the text
     # Use the real max points instead of max_points
     points_red = max_points_red - score_red
     points_blue = max_points_blue - score_blue
@@ -496,14 +496,15 @@ class Piece:
         if self.hp <= 0:
             self.hp = 0
             print(f"{self.name} is dead!")
-            pieces.remove(self)
-            # Increment the score counter
-            if self.team.name == "Red":
-                score_blue += self.point_value
-            elif self.team.name == "Blue":
-                score_red += self.point_value
-            else:
-                print(f"Unknown team: {self.team.name}")
+            if self in pieces:
+                pieces.remove(self)
+                # Increment the score counter
+                if self.team.name == "Red":
+                    score_blue += self.point_value
+                elif self.team.name == "Blue":
+                    score_red += self.point_value
+                else:
+                    print(f"Unknown team: {self.team.name}")
 
     def draw(self, screen):
         x, y = self.position
@@ -614,6 +615,10 @@ class Piece:
                                 if screen_cx < WIDTH - EXTRA_WIDTH_RIGHT:
                                     if cell_properties and not cell_properties.get('walkable', True):
                                         continue
+                                    if cell_properties.get('terrain') == "cover" and self.type == "Vehicle":
+                                        continue
+                                    if cell_properties.get('terrain') == "ruins" and self.type in ["Vehicle", "Artillery"]:
+                                        continue
                                     if not any(p.position == new_position for p in pieces):
                                         draw_circles("move", screen, (screen_cx, screen_cy))
 
@@ -623,7 +628,6 @@ class Piece:
             cell_properties = get_cell_properties(self.position, grid_properties)
             attack_cost = cell_properties['attack_cost'] if cell_properties else 0
             radius_attack = self.attack_distance + attack_cost
-            type_1 = type(self).__name__
 
             for dx in range(-radius_attack, radius_attack + 1):
                 for dy in range(-radius_attack, radius_attack + 1):
@@ -631,13 +635,12 @@ class Piece:
                         new_position = (x + dx, y + dy)
                         screen_cx, screen_cy = world_to_screen(x + dx + 0.5, y + dy + 0.5)
                         if screen_cx < WIDTH - EXTRA_WIDTH_RIGHT:
-                            target = next((p for p in pieces if p.position == new_position and compatibility(type_1, type(p).__name__)), None)
-                            type_2 = type(target).__name__
+                            target = next((p for p in pieces if p.position == new_position and compatibility(self.type, p.type)), None)
                             if target:
                                 if self.draw_red_circles:
                                     if target.team != self.team:  # Check if the target is an enemy
 
-                                        if self.forward and not compatibility(type_1, type_2): #and self.team.is_enemy(target.team): #for a piece that finds a target with forward action and is not compatible with the attack
+                                        if self.forward and not compatibility(self.type, target.type): #and self.team.is_enemy(target.team): #for a piece that finds a target with forward action and is not compatible with the attack
                                             self.draw_red_circles = False
                                         else:
                                             if isinstance(self, Howitzer):
@@ -645,7 +648,7 @@ class Piece:
                                                 draw_circles("fire", screen, (screen_cx, screen_cy))
                                             elif not line_of_sight_blocked(self.position, target.position, grid_properties):
                                                 # For other pieces, consider the line of sight
-                                                if compatibility(type_1, type_2):
+                                                if compatibility(self.type, target.type):
                                                     draw_circles("fire", screen, (screen_cx, screen_cy))
 
         elif self.current_action == "forward":
@@ -681,10 +684,8 @@ class Piece:
             down_bonus = 0
 
         # Check if self is a vehicle (should not use cannon but machine gun against infantry)
-        type_1 = type(self).__name__
-        type_2 = type(target).__name__
         x, y = target.position
-        if (type_1 == "MediumTank" or type_1 == "HeavyTank" or type_1 == "Armored") and (type_2 != "MediumTank" or type_2 != "HeavyTank" or type_2 != "Armored"):
+        if self.type == "Vehicle" and target.type in ["Soldier", "Soldier_Heavy"]:
             damage = HeavyMachineGun.fire_power
             self.shots = HeavyMachineGun.shots
             self.hit_probability = HeavyMachineGun.hit_probability
@@ -777,7 +778,7 @@ class Piece:
                         play_animation(screen,explosion_frames_zoomed,(sx, sy))
                     else:
                         print(f"{self.name} shot {i+1}/{self.shots} MISSED at {target.name}!")
-                        # Add a missed shot animation (dust instead of explosion
+                        # Add a missed shot animation (dust instead of explosion)
                     target.down = False
 
 def compatibility(type_1, type_2):
@@ -787,11 +788,7 @@ def compatibility(type_1, type_2):
     :param type_1: Type of the attacking piece.
     :param type_2: Type of the piece being attacked.
     """
-    if type_1 == "Rifle" and (type_2 == "HeavyTank" or type_2 == "MediumTank" or type_2 == "Armored"):
-        return False
-    elif type_1 == "AssaultRifle" and (type_2 == "HeavyTank" or type_2 == "MediumTank" or type_2 == "Armored"):
-        return False
-    elif type_1 == "LightMachineGun" and (type_2 == "HeavyTank" or type_2 == "MediumTank" or type_2 == "Armored"):
+    if type_1 == "Soldier"  and type_2 == "Vehicle":
         return False
     else:
         return True
@@ -805,33 +802,37 @@ class Rifle(Piece):
         self.shots = 1
         self.hit_probability = 0.9
         self.HE = False
+        self.type = "Soldier"
 
 class AssaultRifle(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=50, move_distance=3, attack_distance=2, team=team)
         self.fire_power = 10
-        self.point_value = 100
+        self.point_value = 75
         self.shots = 2
         self.hit_probability = 0.85
         self.HE = False
+        self.type = "Soldier"
 
 class LightMachineGun(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=80, move_distance=2, attack_distance=3, team=team)
         self.fire_power = 15
-        self.point_value = 150
+        self.point_value = 100
         self.shots = 2
         self.hit_probability = 0.75
         self.HE = False 
+        self.type = "Soldier"
 
 class MediumMachineGun(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=90, move_distance=1, attack_distance=3, team=team)
         self.fire_power = 18
-        self.point_value = 200
+        self.point_value = 150
         self.shots = 3
         self.hit_probability = 0.7
         self.HE = False
+        self.type = "Soldier_Heavy"
 
 class HeavyMachineGun(Piece):
     # to use with other classes
@@ -842,73 +843,81 @@ class HeavyMachineGun(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=100, move_distance=1, attack_distance=HeavyMachineGun.attack_distance, team=team)
         self.fire_power = HeavyMachineGun.fire_power
-        self.point_value = 250
+        self.point_value = 200
         self.shots = HeavyMachineGun.shots
         self.hit_probability = HeavyMachineGun.hit_probability
         self.HE = False
+        self.type = "Soldier_Heavy"
 
 class Pyromaniac(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=60, move_distance=3, attack_distance=1, team=team)
         self.fire_power = 30
-        self.point_value = 175
+        self.point_value = 150
         self.shots = 1
         self.hit_probability = 0.8
         self.HE = True
+        self.type = "Soldier" #?
 
 class Howitzer(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=90, move_distance=2, attack_distance=10, team=team)
         self.fire_power = 75
-        self.point_value = 225
+        self.point_value = 200
         self.shots = 1
         self.hit_probability = 0.75
         self.HE = True
+        self.type = "Artillery"
 
 class Mortar(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=60, move_distance=2, attack_distance=10, team=team)
         self.fire_power = 40
-        self.point_value = 150
+        self.point_value = 100
         self.shots = 1
         self.hit_probability = 0.8
         self.HE = True
+        self.type = "Artillery"
 
 class AntiTankArtillery(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=75, move_distance=1, attack_distance=5, team=team)
         self.fire_power = 100
-        self.point_value = 250
+        self.point_value = 200
         self.shots = 1
         self.hit_probability = 0.9
         self.HE = False
+        self.type = "Artillery" #?
 
 class Armored(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=150, move_distance=4, attack_distance=HeavyMachineGun.attack_distance, team=team)
         self.fire_power = HeavyMachineGun.fire_power
-        self.point_value = 350
+        self.point_value = 300
         self.shots = HeavyMachineGun.shots
         self.hit_probability = HeavyMachineGun.hit_probability
         self.HE = False
+        self.type = "Vehicle"
 
 class MediumTank(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=300, move_distance=3, attack_distance=4 , team=team)
         self.fire_power = 70
-        self.point_value = 400
+        self.point_value = 350
         self.shots = 1
         self.hit_probability = 0.85
         self.HE = False
+        self.type = "Vehicle"
 
 class HeavyTank(Piece):
     def __init__(self, name, position, team=None):
         super().__init__(name, position, hp=500, move_distance=2, attack_distance=4 , team=team)
         self.fire_power = 90
-        self.point_value = 500
+        self.point_value = 450
         self.shots = 1
         self.hit_probability = 0.85
         self.HE = False
+        self.type = "Vehicle"
 
 def handle_click(mouse_pos, pieces, grid_properties, teams):
     current_team = teams[current_team_index]  # Get the current team
@@ -919,7 +928,6 @@ def handle_click(mouse_pos, pieces, grid_properties, teams):
     if piece_in_action:
         if piece.current_action == "fire":
             x, y = piece.position
-            type_1 = type(piece).__name__
             cell_properties = get_cell_properties(piece.position, grid_properties)
             attack_cost = cell_properties['attack_cost'] if cell_properties else 0
             radius = piece.attack_distance + attack_cost
@@ -936,14 +944,13 @@ def handle_click(mouse_pos, pieces, grid_properties, teams):
                             int(CELL_SIZE * zoom)
                         )
                         if rect.top >= EXTRA_HEIGHT_TOP and rect.bottom <= (HEIGHT - EXTRA_HEIGHT_BOTTOM):
-                            target = next((p for p in pieces if p.position == new_position and compatibility(type_1, type(p).__name__)), None)
-                            type_2 = type(target).__name__
+                            target = next((p for p in pieces if p.position == new_position and compatibility(piece.type, p.type)), None)
                             if rect.collidepoint(mouse_pos):
                                 cell_properties = get_cell_properties(new_position, grid_properties)
                                 defense_bonus = cell_properties['defense_bonus'] if cell_properties else 0
                                 if target and piece.team.is_enemy(target.team):
                                     print(f"Target found: {target.name}, Team: {target.team.name}")
-                                    if compatibility(type_1, type_2):
+                                    if compatibility(piece.type, target.type):
                                         if isinstance(piece, Howitzer) or not line_of_sight_blocked(piece.position, target.position, grid_properties):
                                             piece.attack(target, pieces, teams, defense_bonus, grid_properties)
                                             piece.current_action = None  # Reset the current action
@@ -983,6 +990,10 @@ def handle_click(mouse_pos, pieces, grid_properties, teams):
                         if rect.top >= EXTRA_HEIGHT_TOP and rect.bottom <= (HEIGHT - EXTRA_HEIGHT_BOTTOM):
                             if rect.collidepoint(mouse_pos):
                                 cell_properties = get_cell_properties(new_position, grid_properties)
+                                if cell_properties.get('terrain') == "cover" and piece.type == "Vehicle":
+                                    continue
+                                if cell_properties.get('terrain') == "ruins" and piece.type in ["Vehicle", "Artillery"]:
+                                    continue
                                 if any(p.position == new_position for p in pieces) or not cell_properties.get('walkable', True):
                                     print(f"Movement not allowed: the cell {new_position} is already occupied or is not walkable.")
                                     return
@@ -998,8 +1009,7 @@ def handle_click(mouse_pos, pieces, grid_properties, teams):
                                     for dy_att in range(-radius_attack, radius_attack + 1):
                                         if abs(dx_att) + abs(dy_att) <= radius_attack and (dx_att != 0 or dy_att != 0):
                                             attack_position = (new_position[0] + dx_att, new_position[1] + dy_att) #initial position
-                                            type_1 = type(piece).__name__
-                                            target = next((p for p in pieces if p.position == attack_position and p.team != piece.team and compatibility(type_1, type(p).__name__)), None)
+                                            target = next((p for p in pieces if p.position == attack_position and p.team != piece.team and compatibility(piece.type, p.type)), None)
                                             if target and not line_of_sight_blocked(piece.position, target.position, grid_properties):
                                                 enemies_found = True
                                                 break

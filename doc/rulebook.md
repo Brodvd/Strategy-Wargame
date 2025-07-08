@@ -6,7 +6,7 @@ Two teams face off on a grid-based battlefield. Each team consists of a certain 
 
 ---
 
-## 3. Unit Properties
+## 2. Unit Properties
 
 Each unit possesses:
 - **Name**
@@ -21,23 +21,23 @@ Each unit possesses:
 
 ---
 
-## 4. Unit Types
+## 3. Unit Types
 Below is a list of all unit types with their properties:
 
-| Unity         | Point Value | HP  | Move Distance | Attack Distance | Fire Power | Number Shots | Hit Probability | Note                                                  |
+| Unit         | Point Value | HP  | Move Distance | Attack Distance | Fire Power | Number Shots | Hit Probability | Note                                                  |
 | :------------ | :---------: | :-: | :-----------: | :-------------: | :--------: | :----------: | :-------------: | :---------------------------------------------------- |
 | rifle         | 50          | 50  | 2             | 2               | 10         | 1            | 0.9             | Basic unit                                            |
-| assault rifle | 100         | 50  | 3             | 2               | 10         | 2            | 0.85            | More mobile, higher volume of fire                    |
-| LMG           | 150         | 80  | 2             | 3               | 15         | 2            | 0.75            | Support infantry, greater range/HP                    |
-| MMG           | 200         | 90  | 1             | 3               | 18         | 3            | 0.7             | Heavy fire, slow, defensive                           |
-| HMG           | 250         | 100 | 1             | 4               | 20         | 3            | 0.65            | Maximum anti-infantry fire, very slow                 |
-| pyromaniac    | 175         | 60  | 3             | 1               | 30         | 1            | 0.8             | Close-quarters assault, very powerful but fragile, `HE` |
-| howitzer      | 225         | 90  | 2             | 10              | 75         | 1            | 0.75            | Heavy artillery, powerful against vehicles, `HE`      |
-| mortar        | 150         | 60  | 2             | 10              | 40         | 1            | 0.8             | Light indirect artillery, `HE`                        |
-| anti tank     | 250         | 75  | 1             | 5               | 100        | 1            | 0.9             | Anti-tank specialist, lethal but vulnerable           |
-| armored       | 350         | 150 | 4             | *HMG* | *HMG* | *HMG* | *HMG* | Infantry support                                      |
-| medium tank   | 400         | 300 | 3             | 4* | 70* | 1* | 0.85* | Main battle tank, versatile                           |
-| heavy tank    | 500         | 500 | 2             | 4* | 90* | 1* | 0.85* | Assault tank, very durable                            |
+| assault rifle | 75         | 50  | 3             | 2               | 10         | 2            | 0.85            | More mobile, higher volume of fire                    |
+| LMG           | 100         | 80  | 2             | 3               | 15         | 2            | 0.75            | Support infantry, greater range/HP                    |
+| MMG           | 150        | 90  | 1             | 3               | 18         | 3            | 0.7             | Heavy fire, slow, defensive                           |
+| HMG           | 200         | 100 | 1             | 4               | 20         | 3            | 0.65            | Maximum anti-infantry fire, very slow                 |
+| pyromaniac    | 150         | 60  | 3             | 1               | 30         | 1            | 0.8             | Close-quarters assault, very powerful but vulnerable, `HE` |
+| howitzer      | 200         | 90  | 2             | 10              | 75         | 1            | 0.75            | Heavy artillery, powerful against vehicles, `HE`      |
+| mortar        | 100         | 60  | 2             | 10              | 40         | 1            | 0.8             | Light indirect artillery, `HE`                        |
+| anti tank     | 200         | 75  | 1             | 5               | 100        | 1            | 0.9             | Anti-tank specialist, lethal but vulnerable           |
+| armored       | 300         | 150 | 4             | *HMG* | *HMG* | *HMG* | *HMG* | Infantry support                                      |
+| medium tank   | 350         | 300 | 3             | 4* | 70* | 1* | 0.85* | Main battle tank,   adaptable                         |
+| heavy tank    | 450         | 500 | 2             | 4* | 90* | 1* | 0.85* | Assault tank, very durable                            |
 
 `*` Values used for vehicle vs. vehicle combat; otherwise, if the opponent is an infantry unit, these values are replaced by those of the *HMG*.
 
@@ -72,13 +72,14 @@ Below is a list of all unit types with their properties:
 | building | 0                 | 0             | 0           | true                 | false    |
 | road     | 0                 | 1             | 0           | false                | true     |
 | bridge   | 10                | 1             | 0           | false                | true     |
-| rough    | 0                 | -1            | 0           | false                | true     |
-| ruined   | 20                | -1            | 0           | true                 | true** |
+| mud      | 0                 | -1            | 0           | false                | true     |
+| ruins    | 20                | -1            | 0           | true                 | true** |
 | cover    | 30                | -1            | 2           | false                | true* |
 
 - `*` Passable by all units except vehicles
 - `**` Passable by all units that are not vehicles or artillery
-**NOTE:** "Ruined" refers to a ruined building, therefore not passable by vehicles and artillery but only soldiers, while "cover" refers to small trenches built with sandbags or stones.
+
+**NOTE:** "Ruins" refers to a ruined building, therefore not passable by vehicles and artillery but only soldiers, while "cover" refers to small trenches built with sandbags or stones.
 
 ---
 
